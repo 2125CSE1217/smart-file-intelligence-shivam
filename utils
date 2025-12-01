@@ -1,0 +1,80 @@
+# utils.py - helper functions
+import os
+import csv
+import json
+import re
+
+def detect_file_type(filename):
+    _, ext = os.path.splitext(filename)
+    return ext.lower()
+
+def extract_text(path, ftype):
+    try:
+        if ftype == ".txt":
+            with open(path, "r", encoding="utf-8", errors="ignore") as f:
+                return f.read()
+        if ftype == ".csv":
+            texts = []
+            with open(path, newline='', encoding='utf-8', errors='ignore') as csvfile:
+                reader = csv.reader(csvfile)
+                for row in reader:
+                    texts.append(" ".join(row))
+            return "\n".join(texts)
+        if ftype == ".pdf":
+            try:
+                import PyPDF2
+                text = []
+                with open(path, "rb") as f:
+                    reader = PyPDF2.PdfReader(f)
+                    for page in reader.pages:
+                        text.append(page.extract_text() or "")
+                return "\n".join(text)
+            except Exception as e:
+                append_log(f"PDF extraction failed for {path}: {e}")
+                return ""
+        return ""
+    except Exception as e:
+        append_log(f"Error extracting {path}: {e}")
+        return ""
+
+def clean_text(text):
+    # basic cleaning: remove extra spaces, non-printable chars
+    text = text.replace("\r", " ")
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
+
+def summarize_text(cleaned, filename):
+    words = cleaned.split()
+    word_count = len(words)
+    line_count = cleaned.count('\n') + 1
+    # simple keyword extraction: top frequent words excluding stopwords
+    stopwords = set(['the','is','and','a','to','of','in','it','for','on','with'])
+    freq = {}
+    for w in words:
+        w = re.sub(r'[^a-zA-Z]', '', w).lower()
+        if not w or w in stopwords:
+            continue
+        freq[w] = freq.get(w,0) + 1
+    top = sorted(freq.items(), key=lambda x: x[1], reverse=True)[:5]
+    keywords = [k for k,_ in top]
+    meta = {
+        "filename": filename,
+        "word_count": word_count,
+        "line_count": line_count,
+        "top_keywords": keywords
+    }
+    summary = f"File: {filename} | Words: {word_count} | Lines: {line_count} | Keywords: {', '.join(keywords)}"
+    return meta, summary
+
+def save_outputs(filename, cleaned, meta):
+    out_clean = os.path.join("output","cleaned", filename + ".clean.txt")
+    with open(out_clean, "w", encoding="utf-8") as oc:
+        oc.write(cleaned)
+    meta_path = os.path.join("output","meta", filename + ".meta.json")
+    with open(meta_path, "w", encoding="utf-8") as jm:
+        json.dump(meta, jm, indent=4)
+
+def append_log(msg):
+    os.makedirs("output", exist_ok=True)
+    with open(os.path.join("output","log.txt"), "a", encoding="utf-8") as lf:
+        lf.write(msg + "\n")
