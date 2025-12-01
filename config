@@ -1,0 +1,11 @@
+{
+    "input_folder": "input",
+    "output_folder": "output",
+    "supported_types": [
+        ".txt",
+        ".csv",
+        ".pdf"
+    ],
+    "keyword_count": 5,
+    "pdf_support": true
+}
