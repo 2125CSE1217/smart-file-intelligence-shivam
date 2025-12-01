@@ -1,0 +1,53 @@
+# Smart File Intelligence System — Created by Shivam Chaurasia
+
+**Project type:** Run-ready automation / workflow  
+**Author:** Shivam Chaurasia  
+**Purpose:** This project automates the intake, processing, and summarization of different file types (TXT, CSV, PDF) placed in an `input/` folder. It extracts text, cleans it, categorizes files by content type, generates summary reports, and stores outputs in `output/`. The system is modular, easy to run, and demonstrates real-world automation skills.
+
+## Features
+- Detects file types: `.txt`, `.csv`, `.pdf` (PDF support optional)
+- Extracts and cleans text from each file
+- Generates per-file summaries (word count, line count, top keywords)
+- Saves cleaned text into `output/cleaned/`
+- Saves per-file JSON metadata into `output/meta/`
+- Creates a daily aggregated report `output/report.txt`
+- Logs all steps into `output/log.txt`
+- Configurable via `config.json`
+
+## Why this project stands out
+- Real-world workflow that mimics corporate automation pipelines
+- Modular and well-documented code suitable for recruiters to review
+- Minimal dependencies; PDF support is optional (PyPDF2)
+- Designed to be uploaded to GitHub as a strong portfolio item
+
+## How to run (very simple)
+1. Extract the repository folder.
+2. Put files you want processed into the `input/` folder (sample files are provided).
+3. (Optional) Install PyPDF2 for PDF text extraction:
+   ```
+   pip install PyPDF2
+   ```
+4. Run:
+   ```
+   python main.py
+   ```
+5. Check results in `output/`:
+   - `output/cleaned/` : cleaned text files
+   - `output/meta/` : JSON metadata per file
+   - `output/log.txt` : step-by-step log
+   - `output/report.txt` : aggregated summary report
+
+## Repository name suggestion
+`Smart_File_Intelligence_By_Sshivam` or `Smart_File_Intelligence_Shivam`
+
+## Files included
+- `main.py` : main orchestrator
+- `utils.py` : helper functions for extraction and cleaning
+- `config.json` : user settings (file types, keywords)
+- `input/` : sample input files (sample1.txt, sample2.csv)
+- `output/` : generated after running
+- `README.md`, `LICENSE`, `CONTRIBUTING.md`
+
+## How this matches my profile
+This project demonstrates skills listed on my resume: Python automation, ETL-style processing, workflow orchestration, logging, and report generation. It is built to be readable, maintainable, and directly usable in prescreen tests and recruiter reviews.
+
