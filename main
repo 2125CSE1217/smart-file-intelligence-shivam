@@ -1,0 +1,46 @@
+# Smart File Intelligence - Main Orchestrator
+# Created by Shivam Chaurasia
+# Run: python main.py
+
+import os
+import json
+from utils import detect_file_type, extract_text, clean_text, summarize_text, save_outputs, append_log
+
+def process_all(config):
+    inp = config.get("input_folder", "input")
+    files = [f for f in os.listdir(inp) if os.path.isfile(os.path.join(inp,f))]
+    append_log("Starting processing: found {} files".format(len(files)))
+    aggregated = []
+    for fname in files:
+        path = os.path.join(inp, fname)
+        ftype = detect_file_type(fname)
+        append_log(f"Processing file: {fname} detected as {ftype}")
+        text = extract_text(path, ftype)
+        if not text:
+            append_log(f"No text extracted from {fname}")
+            continue
+        cleaned = clean_text(text)
+        meta, summary = summarize_text(cleaned, fname)
+        save_outputs(fname, cleaned, meta)
+        aggregated.append(summary)
+        append_log(f"Completed processing: {fname}")
+    # write aggregated report
+    report_path = os.path.join(config.get("output_folder","output"), "report.txt")
+    with open(report_path, "w") as r:
+        r.write("Smart File Intelligence - Aggregated Report\n")
+        r.write("="*40 + "\n")
+        for s in aggregated:
+            r.write(s + "\n")
+    append_log("Aggregated report generated.")
+    print("Processing complete. Check output/ folder for results.")
+
+if __name__ == "__main__":
+    # load config
+    with open("config.json") as c:
+        config = json.load(c)
+    # ensure folders exist
+    os.makedirs(config.get("input_folder","input"), exist_ok=True)
+    os.makedirs(config.get("output_folder","output"), exist_ok=True)
+    os.makedirs(os.path.join(config.get("output_folder","output"), "cleaned"), exist_ok=True)
+    os.makedirs(os.path.join(config.get("output_folder","output"), "meta"), exist_ok=True)
+    process_all(config)
